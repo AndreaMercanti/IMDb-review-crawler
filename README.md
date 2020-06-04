@@ -18,3 +18,8 @@ To set a new virtual environment, install python, if not already, and then run t
 
 ## Install the needed modules
 `pip install scrapy`
+
+## Fetch the reviews
+`cd scraping`
+
+`scrapy crawl fetcher`
