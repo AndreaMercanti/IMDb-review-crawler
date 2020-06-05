@@ -4,7 +4,7 @@ from ..items import ScrapingItem
 import json
 from datetime import datetime
 
-DATASET_PATH = ''
+DATASET_PATH = 'movie_dataset.json'
 
 class FetcherSpider(scrapy.Spider):
     name = 'fetcher'
