@@ -3,6 +3,7 @@ import scrapy
 from ..items import ScrapingItem
 import json
 from datetime import datetime
+from ..db import DBManager
 
 DATASET_PATH = 'movie_dataset.json'
 
@@ -21,6 +22,8 @@ class FetcherSpider(scrapy.Spider):
             movie = json.loads(file.readline())
             self.filmID = movie['imdbID']
             self.filmTitle = movie['Title']
+            dbMgr = DBManager.getInstance()
+            dbMgr.addFilm(self.filmID, self.filmTitle)
             self.ajax_url = 'https://www.imdb.com/title/{}/reviews/_ajax?sort=userRating&dir=desc&ratingFilter=0'.format(self.filmID)
             yield scrapy.Request(self.ajax_url, callback=self.parse, dont_filter=True)
 
@@ -40,7 +43,6 @@ class FetcherSpider(scrapy.Spider):
             rating = ''.join(rating_components) # compacting all rating components into one string
             
             item['filmID'] = self.filmID
-            item['filmTitle'] = self.filmTitle
             item['user'] = user
             item['rating'] = rating
             item['date'] = date

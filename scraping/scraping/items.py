@@ -9,7 +9,6 @@ import scrapy
 
 class ScrapingItem(scrapy.Item):
     filmID = scrapy.Field()
-    filmTitle = scrapy.Field()
     user = scrapy.Field()
     rating = scrapy.Field()
     date = scrapy.Field()
