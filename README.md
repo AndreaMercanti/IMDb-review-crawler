@@ -17,7 +17,7 @@ To set a new virtual environment, install python, if not already, and then run t
 `.\venv\Scripts\activate`
 
 ## Install the needed modules
-`pip install scrapy`
+`pip install scrapy sqlalchemy`
 
 ## Fetch the reviews
 `cd scraping`

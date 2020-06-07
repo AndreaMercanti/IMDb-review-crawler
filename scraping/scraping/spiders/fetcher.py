@@ -12,13 +12,16 @@ class FetcherSpider(scrapy.Spider):
 
     def __init__(self, **kwargs):
         self.ajax_url = None
+        self.filmID = None
+        self.filmTitle = None
         super().__init__(**kwargs)
 
     def start_requests(self):
         with open(DATASET_PATH, 'r') as file:
             movie = json.loads(file.readline())
-            filmID = movie['imdbID']
-            self.ajax_url = 'https://www.imdb.com/title/{}/reviews/_ajax?sort=userRating&dir=desc&ratingFilter=0'.format(filmID)
+            self.filmID = movie['imdbID']
+            self.filmTitle = movie['Title']
+            self.ajax_url = 'https://www.imdb.com/title/{}/reviews/_ajax?sort=userRating&dir=desc&ratingFilter=0'.format(self.filmID)
             yield scrapy.Request(self.ajax_url, callback=self.parse, dont_filter=True)
 
     def parse(self, response):
@@ -36,6 +39,8 @@ class FetcherSpider(scrapy.Spider):
             review_str = ''.join(review_components[0:-2]) # compacting all the review components into one string, but the last two
             rating = ''.join(rating_components) # compacting all rating components into one string
             
+            item['filmID'] = self.filmID
+            item['filmTitle'] = self.filmTitle
             item['user'] = user
             item['rating'] = rating
             item['date'] = date
