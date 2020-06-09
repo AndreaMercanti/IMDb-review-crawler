@@ -4,13 +4,14 @@ from sqlalchemy import Column, String, Integer, Date, Text, ForeignKey
 from sqlalchemy.orm import relationship, sessionmaker
 from typing import List
 from datetime import date
+import pymysql
 
 Base = declarative_base()
 
 class Film(Base):
     __tablename__ = 'films'
     
-    id = Column(String, primary_key=True)
+    id = Column(String(10), primary_key=True)
     title = Column(Text)
 
     reviews = relationship("Review", back_populates="film") # gets populated with the Review objects linked to this film
@@ -25,7 +26,7 @@ class Review(Base):
     __tablename__ = 'reviews'
 
     id = Column(Integer, primary_key=True)
-    film_id = Column(String, ForeignKey('films.id')) # code of the film
+    film_id = Column(String(10), ForeignKey('films.id')) # code of the film
     user = Column(String(50), unique=True)
     rating = Column(String(5))
     date = Column(Date)
@@ -48,7 +49,7 @@ class DBManager:
         """Create a new manager instance and the DB, if both not already existing."""
         if DBManager.__instance == None:
             DBManager.__instance = self
-            self.engine = create_engine('sqlite:///prova.db', echo=True)
+            self.engine = create_engine('mysql+pymysql://rsUser:rs_password@localhost/rs_db', echo=True)
             Base.metadata.create_all(self.engine)
         else:
             pass

@@ -4,6 +4,7 @@ from ..items import ScrapingItem
 import json
 from datetime import datetime
 from ..db import DBManager
+from sqlalchemy.exc import IntegrityError
 
 DATASET_PATH = 'movie_dataset.json'
 
@@ -23,7 +24,10 @@ class FetcherSpider(scrapy.Spider):
             self.filmID = movie['imdbID']
             self.filmTitle = movie['Title']
             dbMgr = DBManager.getInstance()
-            dbMgr.addFilm(self.filmID, self.filmTitle)
+            try:
+                dbMgr.addFilm(self.filmID, self.filmTitle)
+            except IntegrityError:
+                print('The film already exists')
             self.ajax_url = 'https://www.imdb.com/title/{}/reviews/_ajax?sort=userRating&dir=desc&ratingFilter=0'.format(self.filmID)
             yield scrapy.Request(self.ajax_url, callback=self.parse, dont_filter=True)
 
