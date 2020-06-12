@@ -20,16 +20,17 @@ class FetcherSpider(scrapy.Spider):
 
     def start_requests(self):
         with open(DATASET_PATH, 'r') as file:
-            movie = json.loads(file.readline())
-            self.filmID = movie['imdbID']
-            self.filmTitle = movie['Title']
-            dbMgr = DBManager.getInstance()
-            try:
-                dbMgr.addFilm(self.filmID, self.filmTitle)
-            except IntegrityError:
-                print('The film already exists')
-            self.ajax_url = 'https://www.imdb.com/title/{}/reviews/_ajax?sort=userRating&dir=desc&ratingFilter=0'.format(self.filmID)
-            yield scrapy.Request(self.ajax_url, callback=self.parse, dont_filter=True)
+            for line in file.readlines():
+                movie = json.loads(line)
+                self.filmID = movie['imdbID']
+                self.filmTitle = movie['Title']
+                dbMgr = DBManager.getInstance()
+                try:
+                    dbMgr.addFilm(self.filmID, self.filmTitle)
+                except IntegrityError:
+                    print('The film already exists')
+                self.ajax_url = 'https://www.imdb.com/title/{}/reviews/_ajax?sort=userRating&dir=desc&ratingFilter=0'.format(self.filmID)
+                yield scrapy.Request(self.ajax_url, callback=self.parse, dont_filter=True)
 
     def parse(self, response):
         item = ScrapingItem()
