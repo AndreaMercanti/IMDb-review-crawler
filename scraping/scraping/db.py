@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, String, Integer, Date, Text, ForeignKey
+from sqlalchemy import Column, String, Integer, Date, Text, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship, sessionmaker
 from typing import List
 from datetime import date
@@ -27,10 +27,11 @@ class Review(Base):
 
     id = Column(Integer, primary_key=True)
     film_id = Column(String(10), ForeignKey('films.id')) # code of the film
-    user = Column(String(50), unique=True)
+    user = Column(String(50))
     rating = Column(String(5))
     date = Column(Date)
     review = Column(Text)
+    UniqueConstraint(film_id, user, name='secondary_key')
 
     film = relationship("Film", back_populates="reviews") # gets populated with the Film object linked to this review
 
@@ -62,7 +63,7 @@ class DBManager:
         return DBManager.__instance
 
     def addFilm(self, id: str, title: str):
-        """Take care of making and adding automatically to the db a new :class:`Film` instance, 
+        """Take care of making and adding automatically to the db a new :class:`.Film` instance, 
         made up of the parameters."""
         Session = sessionmaker(bind=self.engine)
         session = Session()
@@ -74,8 +75,8 @@ class DBManager:
         session.close()
 
     def addReview(self, user: str, rating: str, date: date, review: str, film: Film):
-        """Take care of making and adding automatically to the db a new :class:`Review` instance, 
-        made up of the parameters where `film` (istance of :class:`Film`) is the one the review refers to."""
+        """Take care of making and adding automatically to the db a new :class:`.Review` instance, 
+        made up of the parameters where `film` (istance of :class:`.Film`) is the one the review refers to."""
         Session = sessionmaker(bind=self.engine)
         session = Session()
 
@@ -98,7 +99,7 @@ class DBManager:
         return reviews
 
     def getFilmByID(self, ID: str) -> Film:
-        """If it exists, return the film (istance of :class:`Film`) having that `ID`
+        """If it exists, return the film (istance of :class:`.Film`) having that `ID`
          from the db, otherwise return `None`."""
         
         Session = sessionmaker(bind=self.engine)

@@ -18,10 +18,10 @@ class FetcherSpider(scrapy.Spider):
                 
                 film_id = movie['imdbID']
                 film_title = movie['Title']
-                ajax_url = 'https://www.imdb.com/title/{}/reviews/_ajax?sort=userRating&dir=desc&ratingFilter=0'.format(film_id)
+                ajax_url = f'https://www.imdb.com/title/{film_id}/reviews/_ajax?sort=userRating&dir=desc&ratingFilter=0'
                 
                 helper = SpiderHelper(ajax_url, film_id)
-                
+
                 dbMgr = DBManager.getInstance()
                 try:
                     dbMgr.addFilm(film_id, film_title)

@@ -35,4 +35,4 @@ class SpiderHelper(object):
         
         next_page = response.css(".load-more-data").xpath('@data-key').get()
         if next_page is not None:
-            yield scrapy.Request(self.ajaxURL + '&ref_=undefined&paginationKey=' + next_page, callback=self.parse)
+            yield scrapy.Request(f'{self.ajaxURL}&ref_=undefined&paginationKey={next_page}', callback=self.parse)
