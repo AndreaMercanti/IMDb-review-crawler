@@ -2,9 +2,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, Integer, Date, Text, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship, sessionmaker
-from typing import List
+from typing import List, Dict
 from datetime import date
-import pymysql
+import pymysql, json
 
 Base = declarative_base()
 
@@ -109,3 +109,71 @@ class DBManager:
         
         session.close()
         return film
+    
+    def getAllReviews(self) -> List[Review]:
+        """Return a list of all the reviews contained in the db.
+
+        If there are no reviews, return an empty list."""
+        
+        Session = sessionmaker(bind=self.engine)
+        session = Session()
+
+        all_reviews = session.query(Review).all()
+        
+        session.close()
+        return all_reviews
+
+def serialize_review(r: Review) -> Dict[str, str]:
+    d = vars(r)
+    d['id'] = str(d['id'])
+
+    try:
+        # parsing the rating string in integer
+        d['rating'] = int(d['rating'].split('/')[0], base=10)
+    except ValueError:
+        # in case of null string
+        d['rating'] = 0
+    except AttributeError:
+        pass
+    
+    try:
+        del d['_sa_instance_state']
+    except KeyError:
+        pass
+    
+    try:
+        d['date'] = d['date'].strftime('%Y/%m/%d')
+    except AttributeError:
+        pass
+
+    return d
+
+def get_data_for(rec_sys: str, review_list: List[Review]):
+    """Save the reviews in `review_list` into a file in the right JSON format 
+    for the recommender system `rec_sys`."""
+
+    if rec_sys.upper() not in {'ANR', 'JMARS', 'NARRE'}:
+        print('Parameter not valid. Try putting in one number between 0 and 2')
+    else:  
+        if rec_sys == 'ANR':
+            data_path = f'{rec_sys}\\datasets'
+        else:
+            data_path = f'{rec_sys}\\data'
+        
+        with open(f'D:\\UniBa\\TESI\\{data_path}\\imdb_data.json', 'w') as file:
+            if rec_sys == 'NARRE':
+                # save in JSON format
+                json.dump(review_list, file, default=serialize_review)
+            else:
+                # save in JSON lines format
+                for review in review_list:
+                    file.write(json.dumps(review, default=serialize_review) +'\n')
+
+def get_data_for_all():
+    """Save all the reviews from the database in a json file 
+    for each recommender system (ANR, JMARS and NARRE)."""
+    db = DBManager()
+    reviews = db.getAllReviews()
+
+    for sys in ('ANR', 'JMARS', 'NARRE'):
+        get_data_for(sys, reviews)
