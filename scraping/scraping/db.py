@@ -142,7 +142,7 @@ def serialize_review(r: Review) -> Dict[str, str]:
         pass
     
     try:
-        d['date'] = d['date'].strftime('%Y/%m/%d')
+        d['date'] = d['date'].strftime('%Y-%m-%d')
     except AttributeError:
         pass
 
@@ -153,7 +153,7 @@ def get_data_for(rec_sys: str, review_list: List[Review]):
     for the recommender system `rec_sys`."""
 
     if rec_sys.upper() not in {'ANR', 'JMARS', 'NARRE'}:
-        print('Parameter not valid. Try putting in one number between 0 and 2')
+        print('Parameter not valid. Try putting a valid one out of \{anr, jmars, narre\}')
     else:  
         if rec_sys == 'ANR':
             data_path = f'{rec_sys}\\datasets'
@@ -161,7 +161,7 @@ def get_data_for(rec_sys: str, review_list: List[Review]):
             data_path = f'{rec_sys}\\data'
         
         with open(f'D:\\UniBa\\TESI\\{data_path}\\imdb_data.json', 'w') as file:
-            if rec_sys == 'NARRE':
+            if rec_sys == 'JMARS':
                 # save in JSON format
                 json.dump(review_list, file, default=serialize_review)
             else:
