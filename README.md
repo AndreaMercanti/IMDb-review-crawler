@@ -1,5 +1,4 @@
-# URB-RS
-An user's reviews based recommender system, developed for my university degree thesis.
+A Python application developed for my university bachelor degree thesis to build a dataset from users' reviews on movies, retrieved from IMDb via an ad hoc spider.
 
 Before anything, it's recommended to use a virtual environment. You can either use a pre-set virtual environment as
 anaconda, or set a new one in the folder where you're going to clone the repo.
@@ -21,7 +20,7 @@ To set a new virtual environment, install python, if not already, and then run t
 `pip install scrapy sqlalchemy pymysql`
 
 ### Create the db and the dba
-Log in the mysql cli with root user and create the database and the user admin for it:
+Log in the mysql cli with root user and create the database and the user admin for it as so:
 
 `CREATE SCHEMA rs_db;`
 
